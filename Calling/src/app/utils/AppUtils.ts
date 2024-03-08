@@ -10,11 +10,19 @@ import { v1 as generateGUID } from 'uuid';
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const fetchTokenResponse = async (): Promise<any> => {
+ // Check if token exists in localStorage
+  const storedToken = localStorage.getItem('tokenAndUser');
+  if (storedToken) {
+    return JSON.parse(storedToken);
+  }
+
+  // If token not found in localStorage, fetch it from server
   const response = await fetch('/token?scope=voip');
   if (response.ok) {
-    const responseAsJson = await response.json(); //(await response.json())?.value?.token;
-    const token = responseAsJson.token;
-    if (token) {
+    const responseAsJson = await response.json();
+    if (responseAsJson) {
+      // Store token in localStorage
+      localStorage.setItem('tokenAndUser', JSON.stringify(responseAsJson));
       return responseAsJson;
     }
   }
